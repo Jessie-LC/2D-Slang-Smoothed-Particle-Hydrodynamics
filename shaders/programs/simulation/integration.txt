@@ -1,0 +1,64 @@
+State integrate_verlet(State state, State state_previous) {
+    state.position = 2.0 * state.position - state_previous.position + accel(state.position) * dt * dt;
+
+    return state;
+}
+
+State integrate_euler(State state) {
+    // 2nd-order euler integration
+    state.position += state.velocity * dt;
+    state.velocity += accel(state.position) * dt;
+
+    return state;
+}
+
+State integrate_leapfrog_sync_kdk(State state) {
+    // calculate acceleration at t
+    vec3 acceleration = accel(state.position);
+
+    // calculate velocity at t + dt/2
+    state.velocity += acceleration * dt / 2.0;
+
+    // calculate position at t + dt
+    state.position += state.velocity * d;
+
+    // calculate acceleration at t + dt
+    vec3 new_acceleration = accel(state.position);
+
+    // calculate velocity at t + dt
+    state.velocity += new_acceleration * dt / 2.0;
+
+    // OPTIMIZATION:
+    // you can save `new_acceleration` to use in place of `acceleration` on next step
+
+    return state;
+}
+
+State integrate_yoshida(State state) {
+    const float w0 = -pow(2.0, 1.0 / 3.0) / (2.0 - pow(2.0, 1.0 / 3.0));
+    const float w1 = 1.0 / (2.0 - pow(2.0, 1.0 / 3.0));
+
+    State intermediary_1;
+    const float c1 = w1 / 2.0;
+    const float d1 = w1;
+    intermediary_1.position = state.position + c1 * state.velocity * dt;
+    intermediary_1.velocity = state.velocity + d1 * accel(intermediary_1.position) * dt;
+
+    State intermediary_2;
+    const float c2 = (w0 + w1) / 2.0;
+    const float d2 = w0;
+    intermediary_2.position = intermediary_1.position + c2 * intermediary_1.velocity * dt;
+    intermediary_2.velocity = intermediary_1.velocity + d2 * accel(intermediary_2.position) * dt;
+
+    State intermediary_3;
+    const float c3 = (w0 + w1) / 2.0;
+    const float d3 = w1;
+    intermediary_3.position = intermediary_2.position + c3 * intermediary_2.velocity * dt;
+    intermediary_3.velocity = intermediary_2.velocity + d3 * accel(intermediary_3.position) * dt;
+
+    const float c4 = w1 / 2.0;
+    state.position = intermediary_3.position + c4 * intermediary_3.velocity * dt;
+    state.velocity = intermediary_3.velocity;
+
+    return state;
+}
