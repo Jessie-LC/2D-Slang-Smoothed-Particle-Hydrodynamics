@@ -26,13 +26,6 @@ void DrawCircle(in particle_t particle) {
         return;
     }
 
-    //if (particlePixelPosition.x < 0 || particlePixelPosition.x > 511) {
-    //    return;
-    //}
-    //if (particlePixelPosition.y < 0 || particlePixelPosition.y > 511) {
-    //    return;
-    //}
-
     for(int32_t y = -sLength; y <= sLength; ++y) {
         int32_t xSquared = sLength*sLength - y*y;
         int32_t width = int32_t(sqrt(float32_t(xSquared)));
