@@ -23,11 +23,15 @@ const particleGroupCount = 96;
 const particleCount = particleGroupSize * particleGroupCount;
 const particleBufferSize = 84 * particleCount;
 
+const renderBufferWidth = 512;
+const renderBufferHeight = 512;
+const renderBufferSize = 8 * renderBufferWidth * renderBufferHeight;
+
 export function configurePipeline(pipeline: PipelineConfig): void {
     const mainTexture = pipeline.createTexture('mainTexture')
                         .format(Format.RGBA16F)
-                        .width(screenWidth)
-                        .height(screenHeight)
+                        .width(renderBufferWidth)
+                        .height(renderBufferHeight)
                         .mipmap(false)
                         .clear(false)
                         .build();
@@ -40,6 +44,7 @@ export function configurePipeline(pipeline: PipelineConfig): void {
     pipeline.setGlobalExport(globalDefines);
 
     pipeline.createBuffer('particles', particleBufferSize, false);
+    pipeline.createBuffer('pixelbuffer', renderBufferSize, true);
 
     const preRenderStage = pipeline.forStage(Stage.SCREEN_SETUP);
 
@@ -107,6 +112,20 @@ export function configurePipeline(pipeline: PipelineConfig): void {
 
     simulationStage.end();
 
+    const renderStage = pipeline.forStage(Stage.POST_RENDER);
+
+    renderStage.createCompute('draw-particles')
+    .location("programs/rendering/draw-particles.slang", 'DrawParticles')
+    .workGroups(particleGroupCount, 1, 1)
+    .compile();
+
+    renderStage.createComposite('copy-pixelbuffer')
+    .location("programs/rendering/copy.slang", 'CopyPixelbuffer')
+    .target(0, mainTexture)
+    .compile();
+
+    renderStage.end();
+
     pipeline.createCombinationPass('programs/post/combination.slang')
-        .compile();
+    .compile();
 }

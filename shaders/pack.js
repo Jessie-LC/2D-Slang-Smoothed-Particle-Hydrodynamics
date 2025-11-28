@@ -20,11 +20,15 @@ var particleGroupSize = 96;
 var particleGroupCount = 96;
 var particleCount = particleGroupSize * particleGroupCount;
 var particleBufferSize = 84 * particleCount;
+var renderBufferWidth = 512;
+var renderBufferHeight = 512;
+var renderBufferSize = 8 * renderBufferWidth * renderBufferHeight;
 function configurePipeline(pipeline) {
-  const mainTexture = pipeline.createTexture("mainTexture").format(Format.RGBA16F).width(screenWidth).height(screenHeight).mipmap(false).clear(false).build();
+  const mainTexture = pipeline.createTexture("mainTexture").format(Format.RGBA16F).width(renderBufferWidth).height(renderBufferHeight).mipmap(false).clear(false).build();
   const globalDefines = pipeline.createExportList().addInt("PARTICLE_COUNT", particleCount).addInt("PARTICLE_GROUP_SIZE", particleGroupSize).build();
   pipeline.setGlobalExport(globalDefines);
   pipeline.createBuffer("particles", particleBufferSize, false);
+  pipeline.createBuffer("pixelbuffer", renderBufferSize, true);
   const preRenderStage = pipeline.forStage(Stage.SCREEN_SETUP);
   preRenderStage.createCompute("initialize-particles").location("programs/initialize.slang", "InitializeParticles").workGroups(particleGroupCount, 1, 1).compile();
   preRenderStage.createCompute("initialize-density").location("programs/simulation/density.slang", "CalculateDensity").workGroups(particleGroupCount, 1, 1).compile();
@@ -41,6 +45,10 @@ function configurePipeline(pipeline) {
   simulationStage.createCompute("calculate-acceleration-2").location("programs/simulation/acceleration.slang", "CalculateAcceleration").workGroups(particleGroupCount, 1, 1).compile();
   simulationStage.createCompute("calculate-velocity-2").location("programs/simulation/integrate-velocity.slang", "IntegrateVelocity").workGroups(particleGroupCount, 1, 1).compile();
   simulationStage.end();
+  const renderStage = pipeline.forStage(Stage.POST_RENDER);
+  renderStage.createCompute("draw-particles").location("programs/rendering/draw-particles.slang", "DrawParticles").workGroups(particleGroupCount, 1, 1).compile();
+  renderStage.createComposite("copy-pixelbuffer").location("programs/rendering/copy.slang", "CopyPixelbuffer").target(0, mainTexture).compile();
+  renderStage.end();
   pipeline.createCombinationPass("programs/post/combination.slang").compile();
 }
 export {

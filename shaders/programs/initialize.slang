@@ -63,7 +63,7 @@ void InitializeParticles(ComputeInput input) {
     particle.position = (float2(x, y) / float2(height, height)) * boundSize - boundSize / 2.0f;
     particle.velocity = float2(-particle.position.y, particle.position.x) * 0.0f;
 
-    if (particle.position.y <= 5.0f && particle.position.y >= -5.0f) {
+    if (particle.position.y <= 10.0f && particle.position.y >= -10.0f) {
         particle.color = (float3(rng.GetDoubleValue(), rng.GetDoubleValue(), rng.GetDoubleValue()) * 0.7f + 0.3f) * float3(0.2f, 1.0f, 0.5f) * 3.0f;
         particle.velocity = float2(100.0f, 0.0f);
     }
@@ -74,7 +74,7 @@ void InitializeParticles(ComputeInput input) {
     particle.angularMomentum = 0.0f;
 
     particle.density = 1.0f;
-    particle.mass = 1.0f;
+    particle.mass = 0.1f;
     particle.charge = 0.0f;
     particle.gradH = 1.0f;
 

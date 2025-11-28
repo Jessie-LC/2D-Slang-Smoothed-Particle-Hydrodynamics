@@ -20,7 +20,7 @@ precise float32_t IdealGasLaw(float32_t density) {
     return density * R_ideal * 273.0f;
 }
 
-static const float32_t alpha = 0.0005f;
+static const float32_t alpha = 0.002f;
 static const float32_t beta = alpha * 2.0f;
 
 [[shader("compute")]]

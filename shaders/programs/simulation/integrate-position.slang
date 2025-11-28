@@ -15,7 +15,7 @@ struct ComputeInput {
     uint3 globalID : SV_DispatchThreadID;
 };
 
-static const float32_t xsphEpsilon = 0.55f;
+static const float32_t xsphEpsilon = 0.5f;
 
 float2 SmoothVelocity(particle_t particle) {
     // This is also known as XSPH due to how I am applying it
