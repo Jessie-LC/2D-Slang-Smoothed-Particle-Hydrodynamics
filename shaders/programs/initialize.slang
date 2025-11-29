@@ -64,12 +64,10 @@ void InitializeParticles(ComputeInput input) {
     particle.velocity = float2(-particle.position.y, particle.position.x) * 0.0f;
     particle.velocity = (float2(rng.GetDoubleValue(), rng.GetDoubleValue()) * 2.0f - 1.0f) * 0.0f;
 
-    if (particle.position.y <= 4.0f && particle.position.y >= -4.0f) {
+    if (particle.position.y <= 3.0f && particle.position.y >= -3.0f) {
         float32_t blue = (sin(particle.position.x / 2.0f) * 0.5f + 0.5f + cos(particle.position.x / 4.0f) * 0.5f + 0.5f) / 2.0f;
-        particle.color = pow(float3(sin(particle.position.x / 7.0f) * 0.5f + 0.5f, cos(particle.position.x / 8.0f) * 0.5f + 0.5f, blue), float3(6.0f, 4.0f, 3.0f));
-        particle.color = (particle.color + (float3(rng.GetDoubleValue(), rng.GetDoubleValue(), rng.GetDoubleValue()) * 0.7f + 0.3f)) / 2.0f;
-        particle.color = pow(particle.color, 6.0f) * 2.0f;
-        particle.velocity = float2(100.0f, 0.0f);
+        particle.color = pow(float3(sin(particle.position.x / 7.0f) * 0.5f + 0.5f, cos(particle.position.x / 8.0f) * 0.5f + 0.5f, blue), float3(6.0f, 4.0f, 3.0f)) * 2.0f;
+        particle.velocity = float2(200.0f, 0.0f);
     }
 
     particle.acceleration = float2(0.0f, 0.0f);

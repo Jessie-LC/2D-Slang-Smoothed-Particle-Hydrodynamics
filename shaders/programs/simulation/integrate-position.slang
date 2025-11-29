@@ -20,6 +20,7 @@ static const float32_t xsphEpsilon = 0.5f;
 float2 SmoothVelocity(particle_t particle) {
     // This is also known as XSPH due to how I am applying it
     // The goal is to keep particles from going through each other since that is a non-physical behavior
+    // But it seems like it might be breaking the determinism, so it is disabled
 
     precise float32_t particleLength = CalculateSmoothingLength(particle.mass, particle.density);
     float2 smoothed = float2(0.0f);
@@ -53,7 +54,7 @@ void IntegratePosition(ComputeInput input) {
 
     particle_t particle = particles[particleID];
 
-    particle.position = particle.position + SmoothVelocity(particle) * deltaTime;
+    particle.position = particle.position + particle.velocity * deltaTime;
 
     float2 tmpPosition = particle.position;
     tmpPosition = tmpPosition + boundSize / 2.0;
