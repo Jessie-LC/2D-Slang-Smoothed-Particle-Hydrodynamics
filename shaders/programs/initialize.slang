@@ -53,20 +53,22 @@ void InitializeParticles(ComputeInput input) {
 
     rng.SetSeed(particleID * PARTICLE_COUNT * 47672051724u);
 
-    const int32_t height = 96;
+    const int32_t height = 64;
 
     int32_t x = int32_t(particleID) / height;
     int32_t y = int32_t(particleID) % height;
 
     particle_t particle;
-    particle.color = float3(1.0f, 0.0f, 0.0f);
+    particle.color = float3(0.0f, 0.0f, 0.0f);
     particle.position = (float2(x, y) / float2(height, height)) * boundSize - boundSize / 2.0f;
     particle.velocity = float2(-particle.position.y, particle.position.x) * 0.0f;
+    particle.velocity = (float2(rng.GetDoubleValue(), rng.GetDoubleValue()) * 2.0f - 1.0f) * 75.0f;
 
-    if (particle.position.y <= 10.0f && particle.position.y >= -10.0f) {
-        particle.color = (float3(rng.GetDoubleValue(), rng.GetDoubleValue(), rng.GetDoubleValue()) * 0.7f + 0.3f) * float3(0.2f, 1.0f, 0.5f) * 3.0f;
-        particle.velocity = float2(100.0f, 0.0f);
-    }
+    //if (particle.position.y <= 3.0f && particle.position.y >= -3.0f) {
+        float32_t blue = (sin(particle.position.x / 2.0f) * 0.5f + 0.5f + cos(particle.position.x / 4.0f) * 0.5f + 0.5f) / 2.0f;
+        particle.color = pow(float3(sin(particle.position.x / 7.0f) * 0.5f + 0.5f, cos(particle.position.x / 8.0f) * 0.5f + 0.5f, blue), float3(6.0f, 4.0f, 3.0f)) * 2.0f;
+        //particle.velocity = float2(100.0f, 0.0f);
+    //}
 
     particle.acceleration = float2(0.0f, 0.0f);
 
@@ -74,7 +76,7 @@ void InitializeParticles(ComputeInput input) {
     particle.angularMomentum = 0.0f;
 
     particle.density = 1.0f;
-    particle.mass = 0.1f;
+    particle.mass = 1.0f;
     particle.charge = 0.0f;
     particle.gradH = 1.0f;
 

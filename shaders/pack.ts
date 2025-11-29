@@ -18,13 +18,13 @@ const numCellsX = 16;
 const numCellsY = 16;
 const cellCount = numCellsX * numCellsY;
 
-const particleGroupSize = 96;
-const particleGroupCount = 96;
+const particleGroupSize = 64;
+const particleGroupCount = 64;
 const particleCount = particleGroupSize * particleGroupCount;
 const particleBufferSize = 84 * particleCount;
 
-const renderBufferWidth = 512;
-const renderBufferHeight = 512;
+const renderBufferWidth = 256;
+const renderBufferHeight = 256;
 const renderBufferSize = 8 * renderBufferWidth * renderBufferHeight;
 
 export function configurePipeline(pipeline: PipelineConfig): void {
@@ -33,12 +33,13 @@ export function configurePipeline(pipeline: PipelineConfig): void {
                         .width(renderBufferWidth)
                         .height(renderBufferHeight)
                         .mipmap(false)
-                        .clear(false)
                         .build();
 
     const globalDefines = pipeline.createExportList()
                           .addInt('PARTICLE_COUNT', particleCount)
                           .addInt('PARTICLE_GROUP_SIZE', particleGroupSize)
+                          .addInt('RENDER_WIDTH', renderBufferWidth)
+                          .addInt('RENDER_HEIGHT', renderBufferHeight)
                           .build();
 
     pipeline.setGlobalExport(globalDefines);

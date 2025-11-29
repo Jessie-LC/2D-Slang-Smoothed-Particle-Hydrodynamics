@@ -41,6 +41,10 @@ float2 SmoothVelocity(particle_t particle) {
 
     return particle.velocity + smoothed * xsphEpsilon;
 }
+__generic<T : __BuiltinFloatingPointType, let N : int>
+vector<T, N> mod(vector<T, N> x, vector<T, N> y) {
+    __intrinsic_asm "mod";
+}
 
 [[shader("compute")]]
 [numthreads(PARTICLE_GROUP_SIZE, 1, 1)]
@@ -53,7 +57,7 @@ void IntegratePosition(ComputeInput input) {
 
     float2 tmpPosition = particle.position;
     tmpPosition = tmpPosition + boundSize / 2.0;
-    tmpPosition = fmod(tmpPosition, boundSize);
+    tmpPosition = mod(tmpPosition, boundSize);
     tmpPosition = tmpPosition - boundSize / 2.0;
     particle.position = tmpPosition;
 

@@ -39,7 +39,7 @@ float3 ColorDiffusion(in particle_t particle, in uint particleID) {
         diffusion += (found.mass / bulkDensity) * (found.color - particle.color) * kernel;
     }
 
-    return 0.15f * diffusion;
+    return 1.0f * diffusion;
 }
 
 [[shader("compute")]]

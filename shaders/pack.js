@@ -16,16 +16,16 @@ function configureRenderer(renderer) {
 var numCellsX = 16;
 var numCellsY = 16;
 var cellCount = numCellsX * numCellsY;
-var particleGroupSize = 96;
-var particleGroupCount = 96;
+var particleGroupSize = 64;
+var particleGroupCount = 64;
 var particleCount = particleGroupSize * particleGroupCount;
 var particleBufferSize = 84 * particleCount;
-var renderBufferWidth = 512;
-var renderBufferHeight = 512;
+var renderBufferWidth = 256;
+var renderBufferHeight = 256;
 var renderBufferSize = 8 * renderBufferWidth * renderBufferHeight;
 function configurePipeline(pipeline) {
-  const mainTexture = pipeline.createTexture("mainTexture").format(Format.RGBA16F).width(renderBufferWidth).height(renderBufferHeight).mipmap(false).clear(false).build();
-  const globalDefines = pipeline.createExportList().addInt("PARTICLE_COUNT", particleCount).addInt("PARTICLE_GROUP_SIZE", particleGroupSize).build();
+  const mainTexture = pipeline.createTexture("mainTexture").format(Format.RGBA16F).width(renderBufferWidth).height(renderBufferHeight).mipmap(false).build();
+  const globalDefines = pipeline.createExportList().addInt("PARTICLE_COUNT", particleCount).addInt("PARTICLE_GROUP_SIZE", particleGroupSize).addInt("RENDER_WIDTH", renderBufferWidth).addInt("RENDER_HEIGHT", renderBufferHeight).build();
   pipeline.setGlobalExport(globalDefines);
   pipeline.createBuffer("particles", particleBufferSize, false);
   pipeline.createBuffer("pixelbuffer", renderBufferSize, true);

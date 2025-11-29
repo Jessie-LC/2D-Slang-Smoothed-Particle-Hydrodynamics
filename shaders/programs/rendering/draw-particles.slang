@@ -8,6 +8,8 @@ import include.rendering.buffer;
 
 extern static const int PARTICLE_COUNT;
 extern static const int PARTICLE_GROUP_SIZE;
+extern static const int RENDER_WIDTH;
+extern static const int RENDER_HEIGHT;
 
 struct ComputeInput {
     uint groupIndex : SV_GroupIndex;
@@ -18,9 +20,9 @@ struct ComputeInput {
 
 void DrawCircle(in particle_t particle) {
     float32_t smoothingLength = CalculateSmoothingLength(particle.mass, particle.density);
-    
-    int2 particlePixelPosition = int2(((particle.position + boundSize / 2.0f) / boundSize) * 512.0f);
-    int32_t sLength = int32_t((smoothingLength / length(boundSize)) * 512.0f);
+
+    int2 particlePixelPosition = int2(((particle.position + boundSize / 2.0f) / boundSize) * float2(RENDER_WIDTH, RENDER_HEIGHT));
+    int32_t sLength = int32_t((smoothingLength / length(boundSize)) * length(float2(RENDER_WIDTH, RENDER_HEIGHT)));
 
     if (sLength == 0) {
         return;
@@ -30,10 +32,10 @@ void DrawCircle(in particle_t particle) {
         int32_t xSquared = sLength*sLength - y*y;
         int32_t width = int32_t(sqrt(float32_t(xSquared)));
         for(int32_t x = -width; x <= width; ++x) {
-            int2 pixelCoordinate = (particlePixelPosition + int2(x, y)) % int2(512, 512);
+            int2 pixelCoordinate = (particlePixelPosition + int2(x, y)) % int2(RENDER_WIDTH, RENDER_HEIGHT);
 
-            float2 coord = float2(pixelCoordinate.x, pixelCoordinate.y) / 512.0f;
-            coord = coord - float2((512.0f / 2.0f) / 512.0f);
+            float2 coord = float2(pixelCoordinate.x, pixelCoordinate.y) / float2(RENDER_WIDTH, RENDER_HEIGHT);
+            coord = coord - float2((float2(RENDER_WIDTH, RENDER_HEIGHT) / 2.0f) / float2(RENDER_WIDTH, RENDER_HEIGHT));
 
             float2 spatialPosition = coord * boundSize;
             float2 clampedPosition = clamp(spatialPosition, -boundSize/2.0f, boundSize/2.0f);
@@ -57,13 +59,12 @@ void DrawCircle(in particle_t particle) {
             float32_t alpha = reNormalizedKernel;
 
             float3 color;
-            color = particle.color * reNormalizedKernel;
-            color = color * 3.0f;
+            color = particle.color * particle.density;
+            color = color * 8.0f;
             color = color / (1.0f + color);
 
-            int32_t pixelIndex = pixelCoordinate.x + pixelCoordinate.y * 512;
-            int32_t og;
-            InterlockedMax<uint32_t>(pixelbuffer[pixelIndex].pixel, PackPixelColor(float4(color, alpha)), og);
+            int32_t pixelIndex = pixelCoordinate.x + pixelCoordinate.y * RENDER_WIDTH;
+            InterlockedMax<uint32_t>(pixelbuffer[pixelIndex].pixel, PackPixelColor(float4(color, alpha)));
         }
     }
 }
